@@ -2,7 +2,7 @@
 echo テストを実行中...
 echo.
 
-cd /d "c:\Users\kitamaru-yu\Desktop\Github Copilot"
+cd /d "%~dp0\.."
 
 echo 設定のテストを実行...
 python -m pytest tests/test_config.py -v

@@ -7,7 +7,7 @@ echo.
 echo システムを起動中...
 echo.
 
-cd /d "c:\Users\kitamaru-yu\Desktop\Github Copilot"
+cd /d "%~dp0\.."
 
 echo 仮想環境をアクティベート中...
 call .venv\Scripts\activate

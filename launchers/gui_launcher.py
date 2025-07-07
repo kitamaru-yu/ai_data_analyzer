@@ -112,7 +112,7 @@ class DataAnalysisGUI:
             self.progress.start()
             
             # 作業ディレクトリに移動
-            os.chdir(r"c:\Users\kitamaru-yu\Desktop\Github Copilot")
+            os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             
             # Streamlitプロセスを起動
             self.streamlit_process = subprocess.Popen([

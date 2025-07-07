@@ -38,7 +38,7 @@ echo.
 echo    ブラウザで http://localhost:8501 が自動的に開きます
 echo    ※ 終了するには Ctrl+C を押してください
 echo.
-cd /d "c:\Users\kitamaru-yu\Desktop\Github Copilot"
+cd /d "%~dp0\.."
 call .venv\Scripts\activate
 streamlit run src/ui/streamlit_app.py --server.port 8501 --server.headless false --browser.gatherUsageStats false
 goto menu
@@ -48,7 +48,7 @@ cls
 echo.
 echo    📊 システム状態チェック中...
 echo.
-cd /d "c:\Users\kitamaru-yu\Desktop\Github Copilot"
+cd /d "%~dp0\.."
 call .venv\Scripts\activate
 python -c "
 import sys
@@ -85,7 +85,7 @@ cls
 echo.
 echo    ⚙️ 環境設定を表示中...
 echo.
-cd /d "c:\Users\kitamaru-yu\Desktop\Github Copilot"
+cd /d "%~dp0\.."
 call .venv\Scripts\activate
 python -c "
 from src.core.config import Config
@@ -104,7 +104,7 @@ cls
 echo.
 echo    🧪 テストを実行中...
 echo.
-cd /d "c:\Users\kitamaru-yu\Desktop\Github Copilot"
+cd /d "%~dp0\.."
 call .venv\Scripts\activate
 python -m pytest tests/ -v
 echo.
