@@ -10,7 +10,10 @@ import os
 # 自作モジュールのインポート
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# プロジェクトルートをPythonパスに追加
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, project_root)
 
 from main import BusinessDataAnalyzer
 from src.core.config import Config
@@ -19,8 +22,51 @@ from src.core.config import Config
 st.set_page_config(
     page_title="企業データ分析システム",
     page_icon="📊",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+# カスタムCSS
+st.markdown("""
+<style>
+    .main-header {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        padding: 1rem;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .metric-card {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+        margin: 0.5rem 0;
+    }
+    .status-success {
+        background: #d4edda;
+        color: #155724;
+        padding: 0.75rem;
+        border-radius: 5px;
+        border: 1px solid #c3e6cb;
+    }
+    .status-warning {
+        background: #fff3cd;
+        color: #856404;
+        padding: 0.75rem;
+        border-radius: 5px;
+        border: 1px solid #ffeaa7;
+    }
+    .status-error {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 0.75rem;
+        border-radius: 5px;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # セッション状態の初期化
 if 'analyzer' not in st.session_state:
@@ -31,8 +77,13 @@ if 'analysis_complete' not in st.session_state:
     st.session_state.analysis_complete = False
 
 def main():
-    st.title("🏢 企業データ分析・可視化・戦略提案システム")
-    st.markdown("---")
+    # メインヘッダー
+    st.markdown("""
+    <div class="main-header">
+        <h1>🏢 企業データ分析・可視化・戦略提案システム</h1>
+        <p>AI を活用した高度なデータ分析と戦略提案</p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # サイドバーでの設定
     st.sidebar.header("📝 システム設定")
@@ -91,18 +142,34 @@ def main():
     st.sidebar.text(f"処理モデル: {Config.PROCESSING_MODEL}")
     
     # OpenAI API Keyの入力
-    api_key = st.sidebar.text_input("OpenAI API Key", type="password", value=Config.OPENAI_API_KEY or "")
+    st.sidebar.header("🔑 API設定")
+    
+    if Config.OPENAI_API_KEY:
+        st.sidebar.markdown('<div class="status-success">✅ API Key: 環境変数から設定済み</div>', unsafe_allow_html=True)
+        api_key = Config.OPENAI_API_KEY
+    else:
+        st.sidebar.markdown('<div class="status-warning">⚠️ API Keyを入力してください</div>', unsafe_allow_html=True)
+        api_key = st.sidebar.text_input("OpenAI API Key", type="password", placeholder="sk-...")
     
     if api_key:
         try:
             if st.session_state.analyzer is None:
                 st.session_state.analyzer = BusinessDataAnalyzer(api_key=api_key)
-            st.sidebar.success("✅ API Key設定完了")
+            st.sidebar.markdown('<div class="status-success">✅ API Key設定完了</div>', unsafe_allow_html=True)
         except Exception as e:
-            st.sidebar.error(f"❌ API Key設定エラー: {e}")
+            st.sidebar.markdown(f'<div class="status-error">❌ API Key設定エラー: {e}</div>', unsafe_allow_html=True)
             return
     else:
-        st.sidebar.warning("⚠️ OpenAI API Keyを入力してください")
+        st.sidebar.markdown('<div class="status-warning">⚠️ 分析を開始するにはAPI Keyが必要です</div>', unsafe_allow_html=True)
+        
+        # API Key取得方法の案内
+        with st.sidebar.expander("📖 API Key取得方法"):
+            st.markdown("""
+            1. [OpenAI Platform](https://platform.openai.com/)にアクセス
+            2. アカウントを作成/ログイン
+            3. API Keys セクションで新しいキーを作成
+            4. 作成されたキーをコピーして上記に貼り付け
+            """)
         return
     
     # データアップロード
@@ -151,6 +218,97 @@ def main():
         
         with col2:
             st.header("🔍 分析オプション")
+    else:
+        # ウェルカムメッセージ
+        st.markdown("""
+        ## 👋 企業データ分析システムへようこそ！
+        
+        このシステムは、AI を活用して企業データを分析し、戦略的な洞察を提供します。
+        
+        ### 🚀 主な機能:
+        
+        #### 📊 データ分析
+        - **基本統計分析**: データの概要、分布、傾向を把握
+        - **相関分析**: 変数間の関係性を発見
+        - **時系列分析**: 時間的な変化とトレンドを分析
+        - **外れ値検出**: 異常値や特異なパターンを特定
+        
+        #### 🎨 データ可視化
+        - **インタラクティブグラフ**: Plotlyを使用した高度な可視化
+        - **統計チャート**: 分布図、散布図、相関マップ
+        - **ダッシュボード**: エグゼクティブ向け総合ダッシュボード
+        
+        #### 🤖 AI 戦略提案
+        - **データ洞察**: AIによる自動的な洞察抽出
+        - **戦略提案**: ビジネス改善のための具体的な提案
+        - **次のアクション**: 実行可能な行動計画
+        
+        ### 📝 使い方:
+        1. **左側のサイドバーでAI モデルを選択**
+        2. **CSVファイルをアップロード**
+        3. **分析を実行**
+        4. **結果を確認・ダウンロード**
+        
+        ### 🔧 現在の設定:
+        """)
+        
+        # システム状態の表示
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown("""
+            <div class="metric-card">
+                <h4>🤖 AI モデル</h4>
+                <p><strong>分析:</strong> {}</p>
+                <p><strong>戦略:</strong> {}</p>
+                <p><strong>処理:</strong> {}</p>
+            </div>
+            """.format(Config.ANALYSIS_MODEL, Config.STRATEGY_MODEL, Config.PROCESSING_MODEL), unsafe_allow_html=True)
+        
+        with col2:
+            st.markdown("""
+            <div class="metric-card">
+                <h4>📊 利用可能機能</h4>
+                <p>✅ データ分析</p>
+                <p>✅ 可視化</p>
+                <p>✅ AI 戦略提案</p>
+                <p>✅ レポート生成</p>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col3:
+            st.markdown("""
+            <div class="metric-card">
+                <h4>🔧 システム情報</h4>
+                <p><strong>対応形式:</strong> CSV, TXT</p>
+                <p><strong>利用可能モデル:</strong> {}</p>
+                <p><strong>最大トークン:</strong> 2500</p>
+            </div>
+            """.format(len(Config.AVAILABLE_MODELS)), unsafe_allow_html=True)
+        
+        # サンプルデータの提供
+        st.markdown("---")
+        st.subheader("🎯 サンプルデータで試してみる")
+        
+        sample_data = pd.DataFrame({
+            'date': pd.date_range('2024-01-01', periods=12, freq='M'),
+            'sales': [15000, 18000, 22000, 19000, 25000, 28000, 32000, 29000, 35000, 38000, 41000, 45000],
+            'profit': [1500, 1800, 2200, 1900, 2500, 2800, 3200, 2900, 3500, 3800, 4100, 4500],
+            'customers': [150, 180, 220, 190, 250, 280, 320, 290, 350, 380, 410, 450],
+            'region': ['East', 'West', 'North', 'South', 'East', 'West', 'North', 'South', 'East', 'West', 'North', 'South']
+        })
+        
+        if st.button("📝 サンプルデータをダウンロード"):
+            csv = sample_data.to_csv(index=False)
+            st.download_button(
+                label="💾 sample_business_data.csv",
+                data=csv,
+                file_name='sample_business_data.csv',
+                mime='text/csv'
+            )
+        
+        with st.expander("👀 サンプルデータを確認"):
+            st.dataframe(sample_data)
             
             # データ構造分析
             if st.button("🔍 データ構造分析"):
@@ -288,31 +446,6 @@ def main():
                 file_name="analysis_report.md",
                 mime="text/markdown"
             )
-    
-    else:
-        st.info("👆 左側のサイドバーからCSVファイルをアップロードしてください")
-        
-        # サンプルデータの表示
-        st.header("📋 サンプルデータ")
-        sample_data = {
-            'Company': ['TechCorp', 'RetailPlus', 'ManufacturingInc'],
-            'Revenue': [1200000, 800000, 2500000],
-            'Employees': [150, 200, 500],
-            'Industry': ['Technology', 'Retail', 'Manufacturing'],
-            'Profit': [180000, 120000, 350000]
-        }
-        sample_df = pd.DataFrame(sample_data)
-        st.dataframe(sample_df)
-        
-        st.markdown("""
-        ### 📖 使用方法
-        1. **OpenAI API Key** を左側のサイドバーに入力
-        2. **CSVファイル** をアップロード
-        3. **分析オプション** を選択して実行
-        4. **可視化** でデータを確認
-        5. **分析結果** を確認
-        6. **レポート** をダウンロード
-        """)
 
 if __name__ == "__main__":
     main()
