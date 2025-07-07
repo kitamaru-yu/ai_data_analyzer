@@ -220,26 +220,93 @@ def main():
             with col2:
                 st.header("🔍 分析オプション")
                 
+                # 分析状態の表示
+                st.subheader("📊 分析ステータス")
+                status_col1, status_col2, status_col3 = st.columns(3)
+                
+                with status_col1:
+                    if hasattr(st.session_state, 'structure_analysis') and st.session_state.structure_analysis:
+                        st.success("✅ 構造")
+                    else:
+                        st.info("⏳ 構造")
+                
+                with status_col2:
+                    if hasattr(st.session_state, 'ai_analysis') and st.session_state.ai_analysis:
+                        st.success("✅ AI")
+                    else:
+                        st.info("⏳ AI")
+                
+                with status_col3:
+                    if hasattr(st.session_state, 'strategy') and st.session_state.strategy:
+                        st.success("✅ 戦略")
+                    else:
+                        st.info("⏳ 戦略")
+                
+                st.markdown("---")
+                
                 # データ構造分析
-                if st.button("🔍 データ構造分析"):
+                if st.button("🔍 データ構造分析", key="structure_btn"):
                     with st.spinner("分析中..."):
                         structure = st.session_state.analyzer.analyze_data_structure()
                         st.session_state.structure_analysis = structure
                         st.success("✅ データ構造分析完了")
+                        st.rerun()
                 
                 # AI分析
-                if st.button("🤖 AI詳細分析"):
+                if st.button("🤖 AI詳細分析", key="ai_btn"):
                     with st.spinner("AI分析中..."):
                         ai_analysis = st.session_state.analyzer.ai_analyze_data()
                         st.session_state.ai_analysis = ai_analysis
                         st.success("✅ AI分析完了")
+                        st.rerun()
                 
                 # ビジネス戦略提案
-                if st.button("💡 ビジネス戦略提案"):
+                if st.button("💡 ビジネス戦略提案", key="strategy_btn"):
                     with st.spinner("戦略提案中..."):
                         strategy = st.session_state.analyzer.generate_business_strategy()
                         st.session_state.strategy = strategy
                         st.success("✅ 戦略提案完了")
+                        st.rerun()
+                
+                st.markdown("---")
+                
+                # 一括分析ボタン
+                if st.button("🚀 全分析を一括実行", key="all_analysis_btn", type="primary"):
+                    with st.spinner("全分析を実行中..."):
+                        # データ構造分析
+                        structure = st.session_state.analyzer.analyze_data_structure()
+                        st.session_state.structure_analysis = structure
+                        
+                        # AI分析
+                        ai_analysis = st.session_state.analyzer.ai_analyze_data()
+                        st.session_state.ai_analysis = ai_analysis
+                        
+                        # ビジネス戦略提案
+                        strategy = st.session_state.analyzer.generate_business_strategy()
+                        st.session_state.strategy = strategy
+                        
+                        st.success("✅ 全分析完了！")
+                        st.rerun()
+        
+        # 分析結果の表示セクション
+        if st.session_state.df is not None:
+            st.markdown("---")
+            st.header("📋 分析結果")
+            
+            # データ構造分析結果
+            if hasattr(st.session_state, 'structure_analysis') and st.session_state.structure_analysis:
+                with st.expander("🔍 データ構造分析結果", expanded=True):
+                    st.json(st.session_state.structure_analysis)
+            
+            # AI分析結果
+            if hasattr(st.session_state, 'ai_analysis') and st.session_state.ai_analysis:
+                with st.expander("🤖 AI詳細分析結果", expanded=True):
+                    st.markdown(st.session_state.ai_analysis)
+            
+            # 戦略提案結果
+            if hasattr(st.session_state, 'strategy') and st.session_state.strategy:
+                with st.expander("💡 ビジネス戦略提案", expanded=True):
+                    st.markdown(st.session_state.strategy)
         else:
             # データがない場合のウェルカムメッセージ
             st.markdown("### 📥 データをアップロードして開始してください")
