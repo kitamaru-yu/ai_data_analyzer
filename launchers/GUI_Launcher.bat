@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 title 企業データ分析システム - GUI起動
 color 0B
 mode con: cols=80 lines=30

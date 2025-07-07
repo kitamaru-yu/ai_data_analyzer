@@ -133,7 +133,7 @@ def main():
         Config.set_model('strategy', selected_strategy_model)
         Config.set_model('processing', selected_processing_model)
         st.sidebar.success("✅ モデル設定を更新しました")
-        st.experimental_rerun()
+        st.rerun()
     
     # 現在の設定を表示
     st.sidebar.subheader("現在の設定")
