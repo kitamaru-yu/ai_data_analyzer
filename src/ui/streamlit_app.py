@@ -198,27 +198,54 @@ def main():
             st.session_state.analyzer.read_text_file(text_path)
         
         # メインコンテンツ
-        col1, col2 = st.columns([2, 1])
-        
-        with col1:
-            st.header("📊 データ概要")
-            st.dataframe(st.session_state.df.head(10))
+        if st.session_state.df is not None:
+            col1, col2 = st.columns([2, 1])
             
-            # 基本統計情報
-            st.subheader("📈 基本統計")
-            col_stats1, col_stats2 = st.columns(2)
+            with col1:
+                st.header("📊 データ概要")
+                st.dataframe(st.session_state.df.head(10))
+                
+                # 基本統計情報
+                st.subheader("📈 基本統計")
+                col_stats1, col_stats2 = st.columns(2)
+                
+                with col_stats1:
+                    st.metric("データ行数", st.session_state.df.shape[0])
+                    st.metric("データ列数", st.session_state.df.shape[1])
+                
+                with col_stats2:
+                    st.metric("数値列数", len(st.session_state.df.select_dtypes(include=[np.number]).columns))
+                    st.metric("カテゴリ列数", len(st.session_state.df.select_dtypes(include=['object']).columns))
             
-            with col_stats1:
-                st.metric("データ行数", st.session_state.df.shape[0])
-                st.metric("データ列数", st.session_state.df.shape[1])
-            
-            with col_stats2:
-                st.metric("数値列数", len(st.session_state.df.select_dtypes(include=[np.number]).columns))
-                st.metric("カテゴリ列数", len(st.session_state.df.select_dtypes(include=['object']).columns))
-        
-        with col2:
-            st.header("🔍 分析オプション")
-    else:
+            with col2:
+                st.header("🔍 分析オプション")
+                
+                # データ構造分析
+                if st.button("🔍 データ構造分析"):
+                    with st.spinner("分析中..."):
+                        structure = st.session_state.analyzer.analyze_data_structure()
+                        st.session_state.structure_analysis = structure
+                        st.success("✅ データ構造分析完了")
+                
+                # AI分析
+                if st.button("🤖 AI詳細分析"):
+                    with st.spinner("AI分析中..."):
+                        ai_analysis = st.session_state.analyzer.ai_analyze_data()
+                        st.session_state.ai_analysis = ai_analysis
+                        st.success("✅ AI分析完了")
+                
+                # ビジネス戦略提案
+                if st.button("💡 ビジネス戦略提案"):
+                    with st.spinner("戦略提案中..."):
+                        strategy = st.session_state.analyzer.generate_business_strategy()
+                        st.session_state.strategy = strategy
+                        st.success("✅ 戦略提案完了")
+        else:
+            # データがない場合のウェルカムメッセージ
+            st.markdown("### 📥 データをアップロードして開始してください")
+    
+    # データがアップロードされていない場合のウェルカムメッセージ
+    if st.session_state.df is None:
         # ウェルカムメッセージ
         st.markdown("""
         ## 👋 企業データ分析システムへようこそ！
@@ -309,30 +336,15 @@ def main():
         
         with st.expander("👀 サンプルデータを確認"):
             st.dataframe(sample_data)
-            
-            # データ構造分析
-            if st.button("🔍 データ構造分析"):
-                with st.spinner("分析中..."):
-                    structure = st.session_state.analyzer.analyze_data_structure()
-                    st.session_state.structure_analysis = structure
-                    st.success("✅ データ構造分析完了")
-            
-            # AI分析
-            if st.button("🤖 AI詳細分析"):
-                with st.spinner("AI分析中..."):
-                    ai_analysis = st.session_state.analyzer.ai_analyze_data()
-                    st.session_state.ai_analysis = ai_analysis
-                    st.success("✅ AI分析完了")
-            
-            # ビジネス戦略提案
-            if st.button("💡 ビジネス戦略提案"):
-                with st.spinner("戦略提案中..."):
-                    strategy = st.session_state.analyzer.generate_business_strategy()
-                    st.session_state.strategy = strategy
-                    st.success("✅ 戦略提案完了")
         
         # 可視化セクション
         st.header("📊 データ可視化")
+        
+        # データフレームの存在チェック
+        if st.session_state.df is None:
+            st.warning("📥 まずデータをアップロードしてください")
+            return
+            
         viz_tabs = st.tabs(["相関分析", "分布分析", "カテゴリ分析", "トレンド分析"])
         
         numeric_cols = st.session_state.df.select_dtypes(include=[np.number]).columns.tolist()
