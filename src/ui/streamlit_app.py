@@ -8,8 +8,12 @@ import tempfile
 import os
 
 # 自作モジュールのインポート
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from main import BusinessDataAnalyzer
-from config import Config
+from src.core.config import Config
 
 # Streamlitページの設定
 st.set_page_config(
@@ -32,6 +36,53 @@ def main():
     
     # サイドバーでの設定
     st.sidebar.header("📝 システム設定")
+    
+    # モデル選択セクション
+    st.sidebar.subheader("🤖 モデル選択")
+    
+    # 推奨モデルの表示
+    use_case = st.sidebar.selectbox(
+        "用途を選択",
+        ["balanced", "high_quality", "cost_effective", "high_speed"],
+        format_func=lambda x: {
+            "balanced": "バランス重視",
+            "high_quality": "高品質",
+            "cost_effective": "コスト重視",
+            "high_speed": "高速"
+        }[x]
+    )
+    
+    recommended_models = Config.get_model_recommendations(use_case)
+    st.sidebar.info(f"推奨モデル: {', '.join(recommended_models[:3])}")
+    
+    # 分析モデルの選択
+    selected_analysis_model = st.sidebar.selectbox(
+        "分析用モデル",
+        Config.AVAILABLE_MODELS,
+        index=Config.AVAILABLE_MODELS.index(Config.ANALYSIS_MODEL) if Config.ANALYSIS_MODEL in Config.AVAILABLE_MODELS else 0
+    )
+    
+    # 戦略モデルの選択
+    selected_strategy_model = st.sidebar.selectbox(
+        "戦略用モデル",
+        Config.AVAILABLE_MODELS,
+        index=Config.AVAILABLE_MODELS.index(Config.STRATEGY_MODEL) if Config.STRATEGY_MODEL in Config.AVAILABLE_MODELS else 0
+    )
+    
+    # 処理モデルの選択
+    selected_processing_model = st.sidebar.selectbox(
+        "処理用モデル",
+        Config.AVAILABLE_MODELS,
+        index=Config.AVAILABLE_MODELS.index(Config.PROCESSING_MODEL) if Config.PROCESSING_MODEL in Config.AVAILABLE_MODELS else 0
+    )
+    
+    # モデル設定の適用
+    if st.sidebar.button("🔄 モデル設定を適用"):
+        Config.set_model('analysis', selected_analysis_model)
+        Config.set_model('strategy', selected_strategy_model)
+        Config.set_model('processing', selected_processing_model)
+        st.sidebar.success("✅ モデル設定を更新しました")
+        st.experimental_rerun()
     
     # 現在の設定を表示
     st.sidebar.subheader("現在の設定")

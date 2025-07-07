@@ -10,10 +10,10 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # 自作モジュールのインポート
-from config import Config
-from data_analyzer import DataAnalyzer
-from visualizer import DataVisualizer
-from ai_analyzer import AIAnalyzer
+from src.core.config import Config
+from src.core.data_analyzer import DataAnalyzer
+from src.core.visualizer import DataVisualizer
+from src.core.ai_analyzer import AIAnalyzer
 
 class BusinessDataAnalyzer:
     """企業データ分析・可視化・戦略提案システム"""

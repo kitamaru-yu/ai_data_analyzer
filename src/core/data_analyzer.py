@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import json
 from typing import Dict, Any, Optional
-from config import Config
+from .config import Config
 
 class DataAnalyzer:
     """データ分析クラス"""

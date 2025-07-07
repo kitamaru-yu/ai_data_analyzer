@@ -5,7 +5,7 @@ AI分析機能モジュール
 import openai
 import json
 from typing import Dict, Any, Optional
-from config import Config
+from .config import Config
 
 class AIAnalyzer:
     """AI分析クラス"""

@@ -10,7 +10,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from typing import Dict, List, Optional, Any
-from config import Config
+from .config import Config
 import warnings
 warnings.filterwarnings('ignore')
 
